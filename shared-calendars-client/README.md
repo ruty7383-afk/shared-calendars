@@ -1,32 +1,17 @@
-# React + TypeScript + Vite
+# Shared Calendars
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+פרויקט לוחות שנה שיתופיים, הכולל ניהול לוחות, אירועים, חברי לוח ותמונות.
 
-Currently, two official plugins are available:
+## משתמשי בדיקה
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### משתמש 1
+- **Email:** `bdika@gmail.com`
+- **Password:** `12345678`
 
-## React Compiler
+### משתמש 2
+- **Email:** `elad@gmail.com`
+- **Password:** `12345678`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## הערה למורה
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+מומלץ להתחבר עם שני המשתמשים כדי לבדוק פעולות שיתוף והרשאות בין משתמשים שונים.

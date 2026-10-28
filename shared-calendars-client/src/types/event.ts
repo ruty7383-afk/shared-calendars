@@ -17,6 +17,7 @@ export interface CreateEventRequest {
     hebrewDay: number
     repeatsYearly: boolean
     gender?: Gender
+    hasSourceYear: boolean
 
 }
 export interface CreateEventForm {
@@ -43,6 +44,7 @@ export interface EventExist {
     gender?: Gender
     hasImage: boolean
     imageUrl: string | null
+    hasSourceYear: boolean
 }
 export interface UpdateEventRequest {
     title?: string
@@ -53,5 +55,6 @@ export interface UpdateEventRequest {
     hebrewDay?: number
     repeatsYearly?: boolean
     gender?: Gender
+    hasSourceYear?: boolean
 
 }

@@ -8,25 +8,29 @@ export const show = (event: EventExist,nowYear:number) => {
     if (event.type === "birthday") {
         colors = "bg-rose-100 text-rose-700"
 
-        if (event.gender === "male" && years === 13) {
+        if (event.hasSourceYear &&event.gender === "male" && years === 13) {
             text = `בר מצוה ל${event.title}`
         }
-        else if (event.gender === "female" && years === 12) {
+        else if (event.hasSourceYear &&event.gender === "female" && years === 12) {
             text = `בת מצוה ל${event.title}`
         }
         else {
-            text = `יום הולדת ${years} ל${event.title} 🎈`
-        }
+          text = event.hasSourceYear
+        ? `יום הולדת ${years} ל${event.title} 🎈`
+        : `יום הולדת ל${event.title} 🎈`
+}
     }
 
     if (event.type === "anniversary") {
-        text = `יום נשואין ${years} ל${event.title}`
-        colors = "bg-violet-100 text-violet-700"
+       text = event.hasSourceYear
+    ? `יום נשואין ${years} ל${event.title} 💍`
+    : `יום נשואין ל${event.title} 💍`
     }
 
     if (event.type === "memorial") {
-        text = `יום זכרון ${years} ל${event.title} 🕯️`
-        colors = "bg-amber-100 text-amber-800"
+       text = event.hasSourceYear
+    ? `יום זכרון ${years} ל${event.title} 🕯️`
+    : `יום זכרון ל${event.title} 🕯️`
     }
 
     if (event.type === "other") {

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createEvent, uploadImage } from "../../services/authServices"
 import { getErrorMessege } from "../../utils/getErrorMessege"
 import type { CreateEventForm, CreateEventRequest } from "../../types/event"
-import { gematriyaStrToNum, HDate } from "@hebcal/hdate"
+import {    gematriya, gematriyaStrToNum, HDate } from "@hebcal/hdate"
 import { EventForm } from "./EventForm"
 interface Props {
     calendarId: number
@@ -50,6 +50,7 @@ const CreateEvent = ({
 
     const onSubmit = (data: CreateEventForm) => {
         const imageFile = data.image?.[0]
+        const hasSourceYear = !!data.hebrewYearText?.trim()
         let day: number
         let month: number
         let year: number
@@ -63,25 +64,50 @@ const CreateEvent = ({
     {
             day = defaultDay
     month = defaultMonth
-    if (data.repeatsYearly) {
+    if (data.repeatsYearly  && hasSourceYear) {
         year = 5000 + gematriyaStrToNum(data.hebrewYearText!)
     } else {
         year = defaultYear
     }
     }
-        else if (defaultDay != null && defaultMonth != null) {
-            day = defaultDay
-            month = defaultMonth
-            year = 5000 + gematriyaStrToNum(data.hebrewYearText!)
-        } 
-        
+      else if (defaultDay != null && defaultMonth != null) {
+    day = defaultDay
+    month = defaultMonth
+
+    if (hasSourceYear) {
+        year = 5000 + gematriyaStrToNum(data.hebrewYearText!)
+    } else {
+        year = new HDate().getFullYear()
+    }
+}
         //אם יצר ארוע בכפתור
-        else {
-            const date = HDate.fromGematriyaString(data.hebrewDate!)
-            day = date.getDate()
-            month = date.getMonth()
-            year = date.getFullYear()
-        }
+       else {
+    if (data.repeatsYearly) {
+
+        const yearForDate = hasSourceYear
+            ? data.hebrewYearText!
+            : gematriya(new HDate().getFullYear())
+
+        const date = HDate.fromGematriyaString(
+            `${data.hebrewDate} ${yearForDate}`
+        )
+
+        day = date.getDate()
+        month = date.getMonth()
+
+        year = hasSourceYear
+            ? date.getFullYear()
+            : new HDate().getFullYear()
+    }
+    else {
+        const date =
+            HDate.fromGematriyaString(data.hebrewDate!)
+
+        day = date.getDate()
+        month = date.getMonth()
+        year = date.getFullYear()
+    }
+}
         const {
             hebrewDate,
             hebrewYearText,
@@ -93,7 +119,8 @@ const CreateEvent = ({
             ...rest,
             hebrewDay: day,
             hebrewMonth: month,
-            hebrewYear: year
+            hebrewYear: year,
+            hasSourceYear
         }
 
         createEventMutation.mutate({event,imageFile})

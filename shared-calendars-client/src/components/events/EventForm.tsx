@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form"
 import type { CreateEventForm } from "../../types/event"
-import { gematriyaStrToNum, HDate } from "@hebcal/hdate"
+import { gematriya,gematriyaStrToNum, HDate } from "@hebcal/hdate"
 
 
 interface Props {
@@ -209,115 +209,128 @@ const repeatsYearly = watch("repeatsYearly")
             </div>
 
 
-            {defaultDay != null && defaultMonth != null ? (
-                repeatsYearly ? (
-                    <div className="space-y-1.5">
-                        <label
-                            htmlFor="hebrewYearText"
-                            className="block text-sm font-semibold text-slate-700"
-                        >
-                            שנת מקור:
-                        </label>
 
-                        {selectedType !== "note" && (
-                            <input
-                                id="hebrewYearText"
-                                type="text"
-                                placeholder="לדוגמה: תשע״ב"
-                                {...register("hebrewYearText", {
-                                    required: "חובה להזין שנת מקור",
-                                    validate: (value) => {
-                                        if (!value) {
-                                            return "חובה להזין תאריך"
-                                        }
+{defaultDay == null || defaultMonth == null ? (
+    <div className="space-y-1.5">
+        <label
+            htmlFor="hebrewDate"
+            className="block text-sm font-semibold text-slate-700"
+        >
+            {repeatsYearly ? "יום וחודש:" : "תאריך:"}
+        </label>
 
-                                        try {
-                                            const year = gematriyaStrToNum(value)
+        <input
+            id="hebrewDate"
+            type="text"
+            placeholder={
+                repeatsYearly
+                    ? "לדוגמה: י׳ חשוון"
+                    : "לדוגמה: י׳ חשוון תשע״ב"
+            }
+            {...register("hebrewDate", {
+                required: "חובה להזין תאריך",
 
-                                            return year > 0 || "יש להזין שנה עברית תקינה"
-                                        }
-                                        catch {
-                                            return "יש להזין שנה עברית תקינה"
-                                        }
-                                    }
-                                })}
-                                className="
-                                    w-full rounded-xl
-                                    border border-slate-200
-                                    bg-slate-50
-                                    px-4 py-3
-                                    text-sm text-slate-800
-                                    outline-none
-                                    transition
-                                    placeholder:text-slate-400
-                                    focus:border-violet-400
-                                    focus:bg-white
-                                    focus:ring-2
-                                    focus:ring-violet-100
-                                "
-                            />
-                        )}
+                validate: (value) => {
+                    if (!value) {
+                        return "חובה להזין תאריך"
+                    }
 
-                        {errors.hebrewYearText && (
-                            <p className="mt-1 text-xs font-medium text-red-500">
-                                {errors.hebrewYearText.message}
-                            </p>
-                        )}
-                    </div>
-                ) : null
-            ) : (
-                <div className="space-y-1.5">
-                    <label
-                        htmlFor="hebrewDate"
-                        className="block text-sm font-semibold text-slate-700"
-                    >
-                        תאריך:
-                    </label>
+                    try {
+                        const valueToCheck = repeatsYearly
+                            ? `${value} ${gematriya(new HDate().getFullYear())}`
+                            : value
 
-                    <input
-                        id="hebrewDate"
-                        type="text"
-                        placeholder="תאריך מקור, לדוגמה: י׳ חשוון תשע״ב"
-                        {...register("hebrewDate", {
-                            required: "חובה להזין תאריך",
-                            validate: (value) => {
-                                if (!value) {
-                                    return "חובה להזין תאריך"
-                                }
+                        HDate.fromGematriyaString(valueToCheck)
 
-                                try {
-                                    HDate.fromGematriyaString(value)
-                                    return true
-                                }
-                                catch {
-                                    return "יש להזין תאריך עברי תקין"
-                                }
-                            }
-                        })}
-                        className="
-                            w-full rounded-xl
-                            border border-slate-200
-                            bg-slate-50
-                            px-4 py-3
-                            text-sm text-slate-800
-                            outline-none
-                            transition
-                            placeholder:text-slate-400
-                            focus:border-violet-400
-                            focus:bg-white
-                            focus:ring-2
-                            focus:ring-violet-100
-                        "
-                    />
+                        return true
+                    }
+                    catch {
+                        return repeatsYearly
+                            ? "יש להזין יום וחודש עבריים תקינים"
+                            : "יש להזין תאריך עברי תקין"
+                    }
+                }
+            })}
+            className="
+                w-full rounded-xl
+                border border-slate-200
+                bg-slate-50
+                px-4 py-3
+                text-sm text-slate-800
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-violet-400
+                focus:bg-white
+                focus:ring-2
+                focus:ring-violet-100
+            "
+        />
 
-                    {errors.hebrewDate && (
-                        <p className="mt-1 text-xs font-medium text-red-500">
-                            {errors.hebrewDate.message}
-                        </p>
-                    )}
-                </div>
-            )}
+        {errors.hebrewDate && (
+            <p className="mt-1 text-xs font-medium text-red-500">
+                {errors.hebrewDate.message}
+            </p>
+        )}
+    </div>
+) : null}
 
+
+{repeatsYearly && selectedType !== "note" && (
+    <div className="space-y-1.5">
+        <label
+            htmlFor="hebrewYearText"
+            className="block text-sm font-semibold text-slate-700"
+        >
+            שנת מקור:
+        </label>
+
+        <input
+            id="hebrewYearText"
+            type="text"
+            placeholder="לדוגמה: תשע״ב — לא חובה"
+            {...register("hebrewYearText", {
+                validate: (value) => {
+                    if (!value) {
+                        return true
+                    }
+
+                    try {
+                        const year = gematriyaStrToNum(value)
+
+                        return (
+                            year > 0 ||
+                            "יש להזין שנה עברית תקינה"
+                        )
+                    }
+                    catch {
+                        return "יש להזין שנה עברית תקינה"
+                    }
+                }
+            })}
+            className="
+                w-full rounded-xl
+                border border-slate-200
+                bg-slate-50
+                px-4 py-3
+                text-sm text-slate-800
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-violet-400
+                focus:bg-white
+                focus:ring-2
+                focus:ring-violet-100
+            "
+        />
+
+        {errors.hebrewYearText && (
+            <p className="mt-1 text-xs font-medium text-red-500">
+                {errors.hebrewYearText.message}
+            </p>
+        )}
+    </div>
+)}
 
             {selectedType !== "note" && (
                 <div

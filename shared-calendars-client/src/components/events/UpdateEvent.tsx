@@ -3,7 +3,11 @@ import { updateEvent, uploadImage } from "../../services/authServices"
 import { getErrorMessege } from "../../utils/getErrorMessege"
 import type {EventExist,CreateEventForm, UpdateEventRequest } from "../../types/event"
 import { EventForm } from "./EventForm"
-import {  HDate } from "@hebcal/hdate"
+import {
+    gematriya,
+    gematriyaStrToNum,
+    HDate
+} from "@hebcal/hdate"
 import { deleteEventImage } from "../../services/authServices"
 import { useState } from "react"
 interface Props {
@@ -60,12 +64,21 @@ const defaultValues: CreateEventForm = {
     type: event.type,
     visibility: event.visibility,
     repeatsYearly: event.repeatsYearly,
-    gender: event.gender??undefined,
-    hebrewDate: eventDate.renderGematriya(true)
+    gender: event.gender ?? undefined,
+
+    hebrewDate: event.repeatsYearly
+        ? eventDate.renderGematriya(true, true)
+        : eventDate.renderGematriya(true),
+
+    hebrewYearText: event.hasSourceYear
+        ? gematriya(event.hebrewYear)
+        : ""
 }
 
 const onSubmit = (data: CreateEventForm,dirtyFields: Partial<Record<keyof CreateEventForm, boolean>>) => {
        const imageFile = data.image?.[0]
+       const hasSourceYear =
+    !!data.hebrewYearText?.trim()
     const changes: UpdateEventRequest = {}
      if (dirtyFields.title) {
         changes.title = data.title
@@ -82,14 +95,55 @@ const onSubmit = (data: CreateEventForm,dirtyFields: Partial<Record<keyof Create
         if (dirtyFields.repeatsYearly) {
         changes.repeatsYearly = data.repeatsYearly
     }
+    if (dirtyFields.hebrewYearText) {
 
-        if (dirtyFields.hebrewDate) {
-       const date = HDate.fromGematriyaString(data.hebrewDate!)
-          changes.hebrewDay= date.getDate()
-            changes.hebrewMonth = date.getMonth()
-          changes.hebrewYear = date.getFullYear()
+    changes.hasSourceYear = hasSourceYear
 
-        } 
+    if (hasSourceYear) {
+        changes.hebrewYear =
+            5000 +
+            gematriyaStrToNum(
+                data.hebrewYearText!
+            )
+    }
+    else {
+        changes.hebrewYear =
+            new HDate().getFullYear()
+    }
+}
+if (dirtyFields.hebrewDate) {
+
+    if (data.repeatsYearly) {
+
+        const yearForDate = hasSourceYear
+            ? data.hebrewYearText!
+            : gematriya(new HDate().getFullYear())
+
+        const date =
+            HDate.fromGematriyaString(
+                `${data.hebrewDate} ${yearForDate}`
+            )
+
+        changes.hebrewDay = date.getDate()
+        changes.hebrewMonth = date.getMonth()
+
+        if (!hasSourceYear) {
+            changes.hebrewYear =
+                new HDate().getFullYear()
+        }
+    }
+    else {
+
+        const date =
+            HDate.fromGematriyaString(
+                data.hebrewDate!
+            )
+
+        changes.hebrewDay = date.getDate()
+        changes.hebrewMonth = date.getMonth()
+        changes.hebrewYear = date.getFullYear()
+    }
+}
         if (Object.keys(changes).length === 0  && !imageFile) {
     onClose()
     return

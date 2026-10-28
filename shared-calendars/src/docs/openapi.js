@@ -33,6 +33,7 @@ const eventInputProps = {
   type: { type: 'string', enum: ['birthday', 'anniversary', 'memorial', 'note', 'other'], description: 'יום הולדת, יום נישואין, יום זיכרון, הערה, אחר' },
   visibility: { type: 'string', enum: ['shared', 'private'], description: 'משותף או פרטי' },
   ...hebrewDateProps,
+  hasSourceYear: { type: 'boolean', description: 'true if hebrewYear is a real source year (default true). false when no source year was entered' },
   repeatsYearly: {
     type: 'boolean',
     description: 'חוזר כל שנה. אם לא נשלח: true ביום הולדת, יום נישואין ויום זיכרון, ו-false באחר',
@@ -199,6 +200,7 @@ const schemas = {
       type: eventInputProps.type, visibility: eventInputProps.visibility,
       ...hebrewDateProps,
       repeatsYearly: { type: 'boolean' },
+      hasSourceYear: { type: 'boolean' },
       gender: { type: 'string', enum: ['male', 'female'], nullable: true },
       hasImage: { type: 'boolean' }, imageUrl: { type: 'string', nullable: true, description: 'כתובת התמונה ב-Cloudinary, או null' },
       createdAt: { type: 'string', format: 'date-time' },

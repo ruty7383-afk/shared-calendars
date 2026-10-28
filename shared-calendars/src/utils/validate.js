@@ -57,6 +57,14 @@ function validateEvent(data) {
     out.description = requireString(data.description, 'description', 1, 500);
   }
 
+  if (data.hasSourceYear === undefined || data.hasSourceYear === null) {
+    out.hasSourceYear = true;
+  } else if (typeof data.hasSourceYear === 'boolean') {
+    out.hasSourceYear = data.hasSourceYear;
+  } else {
+    throw badRequest('hasSourceYear must be true or false');
+  }
+
   if (data.repeatsYearly === undefined || data.repeatsYearly === null) {
     out.repeatsYearly = REPEATS_BY_DEFAULT[out.type];
   } else if (typeof data.repeatsYearly === 'boolean') {

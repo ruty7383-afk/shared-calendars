@@ -12,12 +12,12 @@ const { uploadImage, deleteImage } = require('../cloudinary');
 const router = express.Router();
 router.use(requireAuth);
 
-const EVENT_FIELDS = ['title', 'description', 'type', 'visibility', 'hebrewYear', 'hebrewMonth', 'hebrewDay', 'repeatsYearly', 'gender'];
+const EVENT_FIELDS = ['title', 'description', 'type', 'visibility', 'hebrewYear', 'hebrewMonth', 'hebrewDay', 'repeatsYearly', 'gender', 'hasSourceYear'];
 
 // התמונות נשמרות ב-Cloudinary. במסד נשמרת רק הכתובת (image_url) והמזהה למחיקה (image_public_id)
 const SELECT_EVENT = `
   SELECT e.id, e.calendar_id, e.created_by_id, u.name AS created_by_name, e.title, e.description, e.type, e.visibility,
-         e.hebrew_year, e.hebrew_month, e.hebrew_day, e.repeats_yearly, e.gender,
+         e.hebrew_year, e.hebrew_month, e.hebrew_day, e.repeats_yearly, e.gender, e.has_source_year,
          (e.image_url IS NOT NULL) AS has_image, e.image_url, e.image_public_id, e.created_at
   FROM events e JOIN users u ON u.id = e.created_by_id`;
 
@@ -34,6 +34,7 @@ const formatEvent = (r) => ({
   hebrewMonth: r.hebrew_month,
   hebrewDay: r.hebrew_day,
   repeatsYearly: r.repeats_yearly,
+  hasSourceYear: r.has_source_year,
   gender: r.gender,
   hasImage: r.has_image,
   imageUrl: r.image_url,
@@ -79,7 +80,7 @@ router.get('/calendars/:id/events', asyncHandler(async (req, res) => {
       : 'e.hebrew_month = $4';
     // אירוע חוזר: מהשנה שנשמרה בו ואילך. אירוע שלא חוזר: רק בשנה שנשמרה בו
     sql += ` AND ${monthMatch}
-             AND ((e.repeats_yearly AND e.hebrew_year <= $3)
+             AND ((e.repeats_yearly AND (NOT e.has_source_year OR e.hebrew_year <= $3))
                OR (NOT e.repeats_yearly AND e.hebrew_year = $3))`;
   }
 
@@ -91,9 +92,9 @@ router.post('/calendars/:id/events', asyncHandler(async (req, res) => {
   const { calendar } = await getCalendarAccess(parseId(req.params.id), req.user.id);
   const e = validateEvent(pick(requireBodyObject(req.body), EVENT_FIELDS));
   const ins = await query(
-    `INSERT INTO events (calendar_id, created_by_id, title, description, type, visibility, hebrew_year, hebrew_month, hebrew_day, repeats_yearly, gender)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id`,
-    [calendar.id, req.user.id, e.title, e.description, e.type, e.visibility, e.hebrewYear, e.hebrewMonth, e.hebrewDay, e.repeatsYearly, e.gender],
+    `INSERT INTO events (calendar_id, created_by_id, title, description, type, visibility, hebrew_year, hebrew_month, hebrew_day, repeats_yearly, gender, has_source_year)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
+    [calendar.id, req.user.id, e.title, e.description, e.type, e.visibility, e.hebrewYear, e.hebrewMonth, e.hebrewDay, e.repeatsYearly, e.gender, e.hasSourceYear],
   );
   const { rows } = await query(`${SELECT_EVENT} WHERE e.id = $1`, [ins.rows[0].id]);
   res.status(201).json(formatEvent(rows[0]));
@@ -118,14 +119,14 @@ router.patch('/events/:eventId', loadEvent, asyncHandler(async (req, res) => {
   const current = {
     title: event.title, description: event.description, type: event.type, visibility: event.visibility,
     hebrewYear: event.hebrew_year, hebrewMonth: event.hebrew_month, hebrewDay: event.hebrew_day,
-    repeatsYearly: event.repeats_yearly, gender: event.gender,
+    repeatsYearly: event.repeats_yearly, gender: event.gender, hasSourceYear: event.has_source_year,
   };
   const e = validateEvent({ ...current, ...changes });
 
   await query(
     `UPDATE events SET title=$1, description=$2, type=$3, visibility=$4, hebrew_year=$5, hebrew_month=$6, hebrew_day=$7,
-                       repeats_yearly=$8, gender=$9 WHERE id=$10`,
-    [e.title, e.description, e.type, e.visibility, e.hebrewYear, e.hebrewMonth, e.hebrewDay, e.repeatsYearly, e.gender, event.id],
+                       repeats_yearly=$8, gender=$9, has_source_year=$10 WHERE id=$11`,
+    [e.title, e.description, e.type, e.visibility, e.hebrewYear, e.hebrewMonth, e.hebrewDay, e.repeatsYearly, e.gender, e.hasSourceYear, event.id],
   );
   const { rows } = await query(`${SELECT_EVENT} WHERE e.id = $1`, [event.id]);
   res.json(formatEvent(rows[0]));

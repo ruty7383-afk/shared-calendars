@@ -79,3 +79,6 @@ ALTER TABLE events ADD COLUMN IF NOT EXISTS image_url TEXT;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS image_public_id TEXT;
 ALTER TABLE events DROP COLUMN IF EXISTS image_data;
 ALTER TABLE events DROP COLUMN IF EXISTS image_mime_type;
+
+-- hasSourceYear: true when a source year was entered. Existing events get true
+ALTER TABLE events ADD COLUMN IF NOT EXISTS has_source_year BOOLEAN NOT NULL DEFAULT TRUE;

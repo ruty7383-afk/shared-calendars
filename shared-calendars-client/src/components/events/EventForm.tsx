@@ -138,9 +138,7 @@ const repeatsYearly = watch("repeatsYearly")
 
                     <select
                         id="gender"
-                        {...register("gender", {
-                            required: "ביום הולדת חובה לבחור מגדר"
-                        })}
+                        {...register("gender")}
                         className="
                             w-full rounded-xl
                             border border-slate-200

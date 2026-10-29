@@ -78,10 +78,7 @@ function validateEvent(data) {
   } else {
     out.gender = requireEnum(data.gender, 'gender', GENDERS);
   }
-  if (out.type === 'birthday' && !out.gender) {
-    throw badRequest('gender is required for a birthday (male or female)');
-  }
-  return out;
+return out;
 }
 
 function validateNote(data) {

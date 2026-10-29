@@ -51,8 +51,7 @@ CREATE TABLE IF NOT EXISTS events (
   gender           VARCHAR(10)  CHECK (gender IN ('male','female')),
   image_url        TEXT,
   image_public_id  TEXT,
-  created_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
-  CHECK (type <> 'birthday' OR gender IS NOT NULL)
+  created_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_events_calendar ON events(calendar_id);
 
@@ -82,3 +81,6 @@ ALTER TABLE events DROP COLUMN IF EXISTS image_mime_type;
 
 -- hasSourceYear: true when a source year was entered. Existing events get true
 ALTER TABLE events ADD COLUMN IF NOT EXISTS has_source_year BOOLEAN NOT NULL DEFAULT TRUE;
+
+-- gender optional for birthday
+ALTER TABLE events DROP CONSTRAINT IF EXISTS events_check;

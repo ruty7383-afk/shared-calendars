@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import CreateCalendar from "../components/calendars/CreateCalendar"
 import ShowCalendar from "../components/calendars/ShowCalendars"
-import ImportSchreiberEvents from "../components/calendars/ImportSchreiberEvents"
 import { useState } from "react"
 const MyCalendars = () => {
 const [showCreate, setShowCreate] = useState(false)
@@ -82,7 +81,6 @@ const [showCreate, setShowCreate] = useState(false)
             >
                 ×
             </button>
-<ImportSchreiberEvents />
             <CreateCalendar
     onCreated={() => setShowCreate(false)}
 />

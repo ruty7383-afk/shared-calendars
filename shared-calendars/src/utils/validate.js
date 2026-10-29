@@ -73,7 +73,7 @@ function validateEvent(data) {
     throw badRequest('repeatsYearly must be true or false');
   }
 
-  if (data.gender === undefined || data.gender === null) {
+  if (data.gender === undefined || data.gender === null || data.gender === '') {
     out.gender = null;
   } else {
     out.gender = requireEnum(data.gender, 'gender', GENDERS);

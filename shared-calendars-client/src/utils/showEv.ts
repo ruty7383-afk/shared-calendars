@@ -22,12 +22,14 @@ export const show = (event: EventExist,nowYear:number) => {
     }
 
     if (event.type === "anniversary") {
+         colors = "bg-violet-100 text-violet-700"
        text = event.hasSourceYear
     ? `יום נשואין ${years} ל${event.title} 💍`
     : `יום נשואין ל${event.title} 💍`
     }
 
     if (event.type === "memorial") {
+        colors = "bg-amber-100 text-amber-800"
        text = event.hasSourceYear
     ? `יום זכרון ${years} ל${event.title} 🕯️`
     : `יום זכרון ל${event.title} 🕯️`
